@@ -391,8 +391,8 @@ func UpdateUserItemSubcriber(nc *nats.Conn) {
 //
 //	Payload: Payload{
 //		Data:{
-//			"sender": sender,
-//			"receiver": receiver,
+//			"sender": senderUsername,
+//			"receiver": receiverUsername,
 //			"amount": amount,
 //		},
 //	},

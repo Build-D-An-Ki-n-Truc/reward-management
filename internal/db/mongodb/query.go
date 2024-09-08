@@ -174,7 +174,7 @@ func ReadAllUserItem() ([]UserItemStruct, error) {
 }
 
 // UpdateUserItem updates a user item
-func UpdateUserItem(username string, voucher string, quantity int) error {
+func UpdateUserItem(username string, voucher string, amount int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -197,8 +197,8 @@ func UpdateUserItem(username string, voucher string, quantity int) error {
 	}
 
 	// Set quantity if quantity > 0
-	if quantity > 0 {
-		update["$set"] = bson.M{"quantity": quantity}
+	if amount > 0 {
+		update["$set"] = bson.M{"amount": amount}
 	}
 
 	if len(update) > 0 {

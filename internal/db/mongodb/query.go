@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CRUD Operation for each collection
@@ -188,7 +189,11 @@ func UpdateUserItem(username string, voucher string, quantity int) error {
 
 	// Push voucher to voucher array if voucher is not empty
 	if voucher != "" {
-		update["$push"] = bson.M{"voucher": voucher}
+		voucherID, err := primitive.ObjectIDFromHex(voucher)
+		if err != nil {
+			return err
+		}
+		update["$push"] = bson.M{"voucher": voucherID}
 	}
 
 	// Set quantity if quantity > 0

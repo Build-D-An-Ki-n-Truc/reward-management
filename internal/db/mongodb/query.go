@@ -197,7 +197,7 @@ func UpdateUserItem(username string, voucher string, amount int) error {
 	}
 
 	// Set quantity if quantity > 0
-	if amount > 0 {
+	if amount >= 0 {
 		update["$set"] = bson.M{"amount": amount}
 	}
 

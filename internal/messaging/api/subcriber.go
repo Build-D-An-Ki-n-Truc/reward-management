@@ -334,24 +334,7 @@ func UpdateUserItemSubcriber(nc *nats.Conn) {
 			amount := Data["amount"].(float64)
 			voucher := Data["voucher"].(string)
 
-			// Convert to ObjectID
-			convertedVoucherID, err := primitive.ObjectIDFromHex(voucher)
-			if err != nil {
-				response := Response{
-					Headers:       request.Data.Headers,
-					Authorization: request.Data.Authorization,
-					Payload: Payload{
-						Type:   []string{"info"},
-						Status: http.StatusBadRequest,
-						Data:   "Failed to convert voucherID, err: " + err.Error(),
-					},
-				}
-				message, _ := json.Marshal(response)
-				m.Respond(message)
-				return
-			}
-
-			err = mongodb.UpdateUserItem(username, convertedVoucherID, int(amount))
+			err := mongodb.UpdateUserItem(username, voucher, int(amount))
 			if err != nil {
 				response := Response{
 					Headers:       request.Data.Headers,

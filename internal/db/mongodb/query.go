@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CRUD Operation for each collection
@@ -174,7 +173,7 @@ func ReadAllUserItem() ([]UserItemStruct, error) {
 }
 
 // UpdateUserItem updates a user item
-func UpdateUserItem(username string, voucher primitive.ObjectID, quantity int) error {
+func UpdateUserItem(username string, voucher string, quantity int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -185,11 +184,24 @@ func UpdateUserItem(username string, voucher primitive.ObjectID, quantity int) e
 		return err
 	}
 
-	// update the quantity of the user item and push the voucher
-	_, err = UserItemColl.UpdateOne(ctx, bson.M{"username": username}, bson.M{"$set": bson.M{"quantity": quantity}, "$push": bson.M{"voucher": voucher}})
+	update := bson.M{}
 
-	if err != nil {
-		return err
+	// Push voucher to voucher array if voucher is not empty
+	if voucher != "" {
+		update["$push"] = bson.M{"voucher": voucher}
 	}
+
+	// Set quantity if quantity > 0
+	if quantity > 0 {
+		update["$set"] = bson.M{"quantity": quantity}
+	}
+
+	if len(update) > 0 {
+		_, err := UserItemColl.UpdateOne(ctx, bson.M{"username": username}, update)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

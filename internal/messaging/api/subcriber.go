@@ -294,6 +294,99 @@ func GetAllUserItemSubcriber(nc *nats.Conn) {
 	}
 }
 
+// Subcriber for update a UserItem, Payload should have data:
+//
+//	Payload: Payload{
+//		Data:{
+//			"username": username,
+//			"amount": amount,
+//			"voucher": voucher, string (ObjectID of the voucher)
+//		},
+//	},
+//
+// reward/updateUserItem/ PUT	-> update a user
+func UpdateUserItemSubcriber(nc *nats.Conn) {
+	subjectUser := createSubscriptionString("updateUserItem", "PUT", "reward")
+	// Subscribe to users/update
+	_, errUser := nc.Subscribe(subjectUser, func(m *nats.Msg) {
+		var request Request
+		// parsing message to Request format
+		unmarshalErr := json.Unmarshal(m.Data, &request)
+		if unmarshalErr != nil {
+			logrus.Println(unmarshalErr)
+			response := Response{
+				Headers:       request.Data.Headers,
+				Authorization: request.Data.Authorization,
+				Payload: Payload{
+					Type:   []string{"info"},
+					Status: http.StatusBadRequest,
+					Data:   "Wrong format",
+				},
+			}
+			message, _ := json.Marshal(response)
+			m.Respond(message)
+			return
+		} else {
+			// Get data from request
+			// type assertion
+			Data := request.Data.Payload.Data.(map[string]interface{})
+			username := Data["username"].(string)
+			amount := Data["amount"].(float64)
+			voucher := Data["voucher"].(string)
+
+			// Convert to ObjectID
+			convertedVoucherID, err := primitive.ObjectIDFromHex(voucher)
+			if err != nil {
+				response := Response{
+					Headers:       request.Data.Headers,
+					Authorization: request.Data.Authorization,
+					Payload: Payload{
+						Type:   []string{"info"},
+						Status: http.StatusBadRequest,
+						Data:   "Failed to convert voucherID, err: " + err.Error(),
+					},
+				}
+				message, _ := json.Marshal(response)
+				m.Respond(message)
+				return
+			}
+
+			err = mongodb.UpdateUserItem(username, convertedVoucherID, int(amount))
+			if err != nil {
+				response := Response{
+					Headers:       request.Data.Headers,
+					Authorization: request.Data.Authorization,
+					Payload: Payload{
+						Type:   []string{"info"},
+						Status: http.StatusBadRequest,
+						Data:   "Failed to update userItem, err: " + err.Error(),
+					},
+				}
+				message, _ := json.Marshal(response)
+				m.Respond(message)
+			} else {
+				response := Response{
+					Headers:       request.Data.Headers,
+					Authorization: request.Data.Authorization,
+					Payload: Payload{
+						Type:   []string{"info"},
+						Status: http.StatusOK,
+						Data:   "UserItem updated",
+					},
+				}
+				message, _ := json.Marshal(response)
+				m.Respond(message)
+				return
+			}
+		}
+	})
+
+	if errUser != nil {
+		log.Println(errUser)
+	}
+
+}
+
 // Subcriber for create a GiftHistory, Payload should have data:
 //
 //	Payload: Payload{

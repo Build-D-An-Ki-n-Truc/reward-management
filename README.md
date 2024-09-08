@@ -5,48 +5,81 @@ This README provides an overview of the user management API and its endpoints.
 
 ## Endpoints
 
-### 1. GET /users/getall
-- Description: Retrieves a list of all users.
-- Response: JSON array containing user objects.
-![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/user-service-go/blob/main/image/getall.png)
+### 1. POST /reward/createUserItem
+- Description: Create a user item to store user's item.
+- Data:{
+		"username": username,
+		"amount": amouunt (amount of items, should be 0),
+	},
+- Response: create userItem status.
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/createUserItem.png)
 
-### 2. GET /users/get
-- Description: Retrieves a specific user by their ID.
+### 2. GET /reward/getUserItem?username=username
+- Description: Retrieves a specific userItem by their username.
 - parameter ?username=username
 - Response: JSON object containing user details.
-![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/user-service-go/blob/main/image/getone.png)
-### 3. POST /users/create
-- Description: Creates a new user.
-- Data:{
-		"username": username,
-		"password": password,
-		"name": name,
-		"email": email,
-		"role": role,
-		"phone": phone,
-		"isLocked": isLocked,
-	},
-- Response: Create failed or succeed
-![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/user-service-go/blob/main/image/create.png)
-### 4. PUT /users/update
-- Description: Updates an existing user.
-- Data:{
-		"username": username (same as existing user),
-		"password": password,
-		"name": name,
-		"email": email,
-		"role": role,
-		"phone": phone,
-		"isLocked": isLocked,
-},
-- Response: Update failed or succeed
-![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/user-service-go/blob/main/image/update.png)
-### 5. DELETE /users/delete
-- Description: Deletes a user.
-- Data:{
-		"username": username,
-},
-- Response: Delete failed or succeed.
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/getUserItem.png)
+### 3. GET /reward/getAllUserItem
+- Description: Retrieves all userItem .
+- parameter ?username=username
+- Response: JSON object containing user details.
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/getAllUserItem.png)
 
-## Placeholder Image
-![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/user-service-go/blob/main/image/delete.png)
+### 4. PUT /reward/updateUserItem
+- Description: Updates an existing userItem.
+- Data:{
+		"username": username,
+		"amount": amouunt,
+		"voucher": voucherID (string)
+	},
+- Response: Update failed or succeed
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/updateUserItem.png)
+### 5. POST /reward/createGiftHistory
+- Description: create a gift history between 2 users.
+- Data:{
+//			"sender": senderUsername,
+//			"receiver": receiverUsername,
+//			"amount": amount,
+//		},
+- Response: create status
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/createUserItem.png)
+
+
+### 6. GET /reward/getSenderGiftHistory?username=username
+- Description: Retrieves a specific sender giftHistory by their username.
+- parameter ?username=username
+- Response: JSON object containing details.
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/getSenderGiftHistory.png)
+
+### 7. GET /reward/getReceiverGiftHistory?username=username
+- Description: Retrieves a specific receiver giftHistory by their username.
+- parameter ?username=username
+- Response: JSON object containing details.
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/getReceiverGiftHistory.png)
+
+### 8. GET /reward/getAllGiftHistory
+- Description: Retrieves a all GiftHistory
+- Response: JSON object containing details.
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/getAllGiftHistory.png)
+
+
+### 9. POST /reward/createExchange
+- Description: create an exchange (user change item into voucher)
+- Data:{
+//			"username": username,
+//			"voucher": voucher, string (ObjectID of the voucher)
+//		}, 
+- Response: create status
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/createExchange.png)
+
+
+### 10. GET /reward/getExchange?username=username
+- Description: get an exchange from a user by their username
+- Response: JSON object containing details.
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/getExchange.png)
+
+### 11. GET /reward/getAllExchange
+- Description: get All exchange 
+- Response: JSON object containing details.
+![Placeholder Image](https://github.com/Build-D-An-Ki-n-Truc/reward-manegment/blob/main/image/getAllExchange.png)
+

@@ -14,10 +14,10 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o main ./cmd/user-management
+RUN go build -o main ./cmd/reward-management
 
-# Expose port 3005 to the outside world
-EXPOSE 3010
+# Expose port 3020 to the outside world
+EXPOSE 3020
 
 # Command to run the executable
 CMD ["./main"]

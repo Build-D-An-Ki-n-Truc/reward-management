@@ -40,6 +40,7 @@ func main() {
 	api.CreateExchangeSubcriber(nc)
 	api.CreateGiftHistorySubcriber(nc)
 	api.CreateUserItemSubcriber(nc)
+
 	api.GetAllExchangeSubcriber(nc)
 	api.GetAllGiftHistorySubcriber(nc)
 	api.GetAllUserItemSubcriber(nc)
@@ -48,8 +49,10 @@ func main() {
 	api.GetReceiverGiftHistorySubcriber(nc)
 	api.GetOneUserItemSubcriber(nc)
 
+	api.UpdateUserItemSubcriber(nc)
+
 	// Initialize MongoDB
 
-	fmt.Println("Auth service running at port 3010")
+	fmt.Println("Reward service running at port 3020")
 	select {}
 }

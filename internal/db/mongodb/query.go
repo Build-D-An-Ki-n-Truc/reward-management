@@ -129,7 +129,7 @@ func CreateUserItem(userItem UserItemStruct) error {
 	var userItemCheck UserItemStruct
 	err := UserItemColl.FindOne(ctx, bson.M{"username": userItem.Username}).Decode(&userItemCheck)
 	if err == nil {
-		return errors.New("Username already exists")
+		return errors.New("username already exists")
 	}
 
 	// Insert the new UserItem

@@ -10,7 +10,6 @@ import (
 	"github.com/Build-D-An-Ki-n-Truc/reward-management/internal/db/mongodb"
 	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cast"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -98,6 +97,7 @@ func createSubscriptionString(endpoint, method, service string) string {
 //
 // reward/createUserItem/ POST	-> create a user
 func CreateUserItemSubcriber(nc *nats.Conn) {
+
 	subjectUser := createSubscriptionString("createUserItem", "POST", "reward")
 	// Subscribe to users/create
 	_, errUser := nc.Subscribe(subjectUser, func(m *nats.Msg) {
@@ -122,8 +122,16 @@ func CreateUserItemSubcriber(nc *nats.Conn) {
 			// Get data from request
 			// type assertion
 			Data := request.Data.Payload.Data.(map[string]interface{})
-			username := cast.ToString(Data["username"])
-			amount := cast.ToFloat64(Data["amount"])
+			username, ok := Data["username"].(string)
+			if !ok {
+				errorCastingResponse(request, "username should be a string", m)
+				return
+			}
+			amount, ok := Data["amount"].(float64)
+			if !ok {
+				errorCastingResponse(request, "amount should be an int", m)
+				return
+			}
 
 			// Create a new user
 			NewUser := mongodb.UserItemStruct{
@@ -331,9 +339,23 @@ func UpdateUserItemSubcriber(nc *nats.Conn) {
 			// Get data from request
 			// type assertion
 			Data := request.Data.Payload.Data.(map[string]interface{})
-			username := cast.ToString(Data["username"])
-			amount := cast.ToFloat64(Data["amount"])
-			voucher := cast.ToString(Data["voucher"])
+			username, ok := Data["username"].(string)
+			if !ok {
+				errorCastingResponse(request, "username should be a string", m)
+				return
+			}
+
+			amount, ok := Data["amount"].(float64)
+			if !ok {
+				errorCastingResponse(request, "amount should be an int", m)
+				return
+			}
+
+			voucher, ok := Data["voucher"].(string)
+			if !ok {
+				errorCastingResponse(request, "voucher should be a string", m)
+				return
+			}
 
 			err := mongodb.UpdateUserItem(username, voucher, int(amount))
 			if err != nil {
@@ -407,9 +429,23 @@ func CreateGiftHistorySubcriber(nc *nats.Conn) {
 			// Get data from request
 			// type assertion
 			Data := request.Data.Payload.Data.(map[string]interface{})
-			sender := cast.ToString(Data["sender"])
-			receiver := cast.ToString(Data["receiver"])
-			amount := cast.ToFloat64(Data["amount"])
+			sender, ok := Data["sender"].(string)
+			if !ok {
+				errorCastingResponse(request, "sender should be a string", m)
+				return
+			}
+
+			receiver, ok := Data["receiver"].(string)
+			if !ok {
+				errorCastingResponse(request, "receiver should be a string", m)
+				return
+			}
+
+			amount, ok := Data["amount"].(float64)
+			if !ok {
+				errorCastingResponse(request, "amount should be an int", m)
+				return
+			}
 
 			// Create a new user
 			NewGiftHistory := mongodb.GiftHistoryStruct{
@@ -684,8 +720,17 @@ func CreateExchangeSubcriber(nc *nats.Conn) {
 			// Get data from request
 			// type assertion
 			Data := request.Data.Payload.Data.(map[string]interface{})
-			username := cast.ToString(Data["username"])
-			voucher := cast.ToString(Data["voucher"])
+			username, ok := Data["username"].(string)
+			if !ok {
+				errorCastingResponse(request, "username should be a string", m)
+				return
+			}
+
+			voucher, ok := Data["voucher"].(string)
+			if !ok {
+				errorCastingResponse(request, "voucher should be a string", m)
+				return
+			}
 
 			// Convert to ObjectID
 			convertedVoucherID, err := primitive.ObjectIDFromHex(voucher)
@@ -872,4 +917,17 @@ func GetAllExchangeSubcriber(nc *nats.Conn) {
 	if errUser != nil {
 		log.Println(errUser)
 	}
+}
+func errorCastingResponse(request Request, err string, m *nats.Msg) {
+	response := Response{
+		Headers:       request.Data.Headers,
+		Authorization: request.Data.Authorization,
+		Payload: Payload{
+			Type:   []string{"info"},
+			Status: http.StatusBadRequest,
+			Data:   err,
+		},
+	}
+	message, _ := json.Marshal(response)
+	m.Respond(message)
 }

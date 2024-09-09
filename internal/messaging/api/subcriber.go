@@ -10,6 +10,7 @@ import (
 	"github.com/Build-D-An-Ki-n-Truc/reward-management/internal/db/mongodb"
 	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cast"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -121,8 +122,8 @@ func CreateUserItemSubcriber(nc *nats.Conn) {
 			// Get data from request
 			// type assertion
 			Data := request.Data.Payload.Data.(map[string]interface{})
-			username := Data["username"].(string)
-			amount := Data["amount"].(float64)
+			username := cast.ToString(Data["username"])
+			amount := cast.ToFloat64(Data["amount"])
 
 			// Create a new user
 			NewUser := mongodb.UserItemStruct{
@@ -330,9 +331,9 @@ func UpdateUserItemSubcriber(nc *nats.Conn) {
 			// Get data from request
 			// type assertion
 			Data := request.Data.Payload.Data.(map[string]interface{})
-			username := Data["username"].(string)
-			amount := Data["amount"].(float64)
-			voucher := Data["voucher"].(string)
+			username := cast.ToString(Data["username"])
+			amount := cast.ToFloat64(Data["amount"])
+			voucher := cast.ToString(Data["voucher"])
 
 			err := mongodb.UpdateUserItem(username, voucher, int(amount))
 			if err != nil {
@@ -406,9 +407,9 @@ func CreateGiftHistorySubcriber(nc *nats.Conn) {
 			// Get data from request
 			// type assertion
 			Data := request.Data.Payload.Data.(map[string]interface{})
-			sender := Data["sender"].(string)
-			receiver := Data["receiver"].(string)
-			amount := Data["amount"].(float64)
+			sender := cast.ToString(Data["sender"])
+			receiver := cast.ToString(Data["receiver"])
+			amount := cast.ToFloat64(Data["amount"])
 
 			// Create a new user
 			NewGiftHistory := mongodb.GiftHistoryStruct{
@@ -683,8 +684,8 @@ func CreateExchangeSubcriber(nc *nats.Conn) {
 			// Get data from request
 			// type assertion
 			Data := request.Data.Payload.Data.(map[string]interface{})
-			username := Data["username"].(string)
-			voucher := Data["voucher"].(string)
+			username := cast.ToString(Data["username"])
+			voucher := cast.ToString(Data["voucher"])
 
 			// Convert to ObjectID
 			convertedVoucherID, err := primitive.ObjectIDFromHex(voucher)
